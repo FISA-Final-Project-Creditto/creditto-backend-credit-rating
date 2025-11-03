@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: credit-rating
+  datasource:
+    url: jdbc:mysql://${DB_URL}/${DATABASE_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver

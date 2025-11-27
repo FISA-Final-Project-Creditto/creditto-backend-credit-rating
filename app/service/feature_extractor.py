@@ -48,7 +48,7 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
                 and row.category in ("LIVING", "RENT", "ENTERTAIN", "ETC", "REMIT_OUT"):
             spend_amounts.append(safe_float(row.amount))
 
-    income_avg_6m = sum(salary_amounts) / 6 if len(salary_amounts) else 0.0 
+    income_avg_6m = sum(salary_amounts) / len(salary_amounts) if salary_amounts else 0.0 
     features["income_avg_6m"] = income_avg_6m
 
     if len(salary_amounts) >= 2:
@@ -58,7 +58,7 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     else:
         features["income_volatility_6m"] = 0.0
 
-    spending_avg_6m = sum(spend_amounts) / 6 if len(spend_amounts) else 0.0
+    spending_avg_6m = sum(spend_amounts) / len(spend_amounts) if spend_amounts else 0.0
     features["spending_avg_6m"] = spending_avg_6m
 
     if income_avg_6m > 0:

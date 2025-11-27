@@ -1,8 +1,8 @@
 # app/service/scoring_service.py
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.schema.score import ScoreRequest
-from app.model.load_model import load_credit_model, load_scaler
 from app.service.feature_extractor import extract_features
 from app.service.score_calculator import calculate_final_score
 from app.repostiory.credit_repository import (
@@ -18,52 +18,43 @@ def calculate_credit_score(request: ScoreRequest,
 
     # 1) Core Banking DB Raw 데이터 조회
     overseas_rows = core_db.execute(
-        """
+        text("""
         SELECT send_amount, status, remittance_date
         FROM overseas_remittance_raw
         WHERE user_id = :user_id
-        """,
+        """),
         {"user_id": user_id}
     ).fetchall()
 
     # 2) MyData DB Raw 데이터 조회
-    account_rows = mydata_db.execute(
-        """
-        SELECT account_open_date, current_balance, collected_at
-        FROM mydata_account_raw
-        WHERE user_id = :user_id
-        """,
-        {"user_id": user_id}
-    ).fetchall()
-
     card_rows = mydata_db.execute(
-        """
+        text("""
         SELECT tx_datetime, tx_amount, pay_type, tx_category,
                credit_limit, outstanding_amt, collected_at
         FROM mydata_card_raw
         WHERE user_id = :user_id
-        """,
+        """),
         {"user_id": user_id}
     ).fetchall()
 
     loan_rows = mydata_db.execute(
-        """
+        text("""
         SELECT loan_principal, interest_rate, status,
                overdue_count_12m, overdue_amount, max_overdue_days,
                last_overdue_dt, collected_at
         FROM mydata_loan_raw
         WHERE user_id = :user_id
-        """,
+        """),
         {"user_id": user_id}
     ).fetchall()
 
     transaction_rows = mydata_db.execute(
-        """
+        text("""
         SELECT tx_datetime, amount, direction, category,
                balance_after, collected_at
         FROM mydata_transaction_raw
         WHERE user_id = :user_id
-        """,
+        """),
         {"user_id": user_id}
     ).fetchall()
 

@@ -5,7 +5,7 @@ from app.schema.score import ScoreRequest, ScoreResponse, ScoreHistoryResponse
 from app.db.core_banking import get_core_banking_db
 from app.db.mydata import get_mydata_db
 import app.service.scoring_service as scoring_service
-import app.repostiory.credit_repository as credit_repository
+import app.repository.credit_repository as credit_repository
 
 router = APIRouter()
 

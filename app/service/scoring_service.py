@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.schema.score import ScoreRequest
 from app.service.feature_extractor import extract_features
 from app.service.score_calculator import calculate_final_score
-from app.repostiory.credit_repository import (
+from app.repository.credit_repository import (
     save_latest_credit_score,
     save_credit_score_history
 )

@@ -31,7 +31,7 @@ class CreditScorePredictRequest(BaseModel):
 # 예측 점수 정보
 class PredictedScore(BaseModel):
     score: int # 예측 점수
-    delta: int # 상슥폭
+    delta: int # 상승폭
 
 # 응답: 예측 응답 전체
 class CreditScorePredictResponse(BaseModel):

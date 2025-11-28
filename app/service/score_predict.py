@@ -1,5 +1,4 @@
 from app.service.score_calculator import calculate_final_score
-import copy
 
 def predict_credit_score_growth(current_features: dict, monthly_remit_amount: float):
     # 현재 점수 계산
@@ -15,13 +14,17 @@ def predict_credit_score_growth(current_features: dict, monthly_remit_amount: fl
     income_avg = base_future_features.get("income_avg_6m", 0)
     ratio_score_factor = 0.0
 
+    REMIT_INCOME_RATIO_CAP = 0.5
+    RATIO_SCORE_WEIGHT = 20.0
+    DEFAULT_RATIO_SCORE_BONUS = 2.0
+
     if income_avg > 0:
         ratio = monthly_remit_amount / income_avg
-        base_future_features["remittance_income_ratio"] = min(0.5, ratio)
-        ratio_score_factor = min(0.5, ratio) * 20
+        base_future_features["remittance_income_ratio"] = min(REMIT_INCOME_RATIO_CAP, ratio)
+        ratio_score_factor = min(REMIT_INCOME_RATIO_CAP, ratio) * RATIO_SCORE_WEIGHT
     else:
         base_future_features["remittance_income_ratio"] = 0.0
-        ratio_score_factor = 2.0 # 기본 가산점
+        ratio_score_factor = DEFAULT_RATIO_SCORE_BONUS # 기본 가산점
     
     # 6개월 후 예측
     feat_6m = base_future_features.copy()

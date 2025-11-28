@@ -98,7 +98,7 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     remit_fail = 0
     remit_total_amount = 0.0
     for row in remit_rows:
-        r_date = to_date(row.remittance_date) 
+        r_date = to_date(row.created_at) 
         if r_date is None: continue
         r_dt_for_comparison = datetime.combine(r_date, datetime.min.time())
         if r_dt_for_comparison >= start_6m: 

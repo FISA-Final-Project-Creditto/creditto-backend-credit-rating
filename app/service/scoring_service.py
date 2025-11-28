@@ -20,10 +20,10 @@ def calculate_credit_score(request: ScoreRequest, core_db: Session, mydata_db: S
     user_id = request.user_id
 
     # DB 조회
-    overseas_rows = core_db.execute(text("SELECT send_amount, status, remittance_date FROM overseas_remittance_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    overseas_rows = core_db.execute(text("SELECT send_amount, status, created_at FROM overseas_remittance WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
 
     features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
     credit_score = calculate_final_score(features)
@@ -41,10 +41,10 @@ def process_prediction(request: CreditScorePredictRequest, core_db: Session, myd
     user_id = request.user_id
     
     # 현재 유저 데이터 조회
-    overseas_rows = core_db.execute(text("SELECT send_amount, status, remittance_date FROM overseas_remittance_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction_raw WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    overseas_rows = core_db.execute(text("SELECT send_amount, remittance_status, created_at FROM overseas_remittance WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
 
     # Feature 추출
     features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)

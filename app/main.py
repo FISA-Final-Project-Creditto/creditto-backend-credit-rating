@@ -9,4 +9,4 @@ def root():
 
 
 # score 라우터 연결
-app.include_router(score_router, prefix="/api/credit-score", tags=["Scoring Credit Rating"])
+app.include_router(score_router, prefix="/api/server/credit-score", tags=["Scoring Credit Rating"])

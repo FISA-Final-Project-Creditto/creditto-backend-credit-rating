@@ -21,9 +21,9 @@ def safe_int(v):
     try: return int(v)
     except: return 0
 
-# =========================================================
+
 #  Feature 추출 함수 (순수 데이터 가공)
-# =========================================================
+# ------------------------------------------
 def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
 
     today = date.today()
@@ -34,7 +34,6 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
 
     features = {}
 
-    # ------------------------------------------
     # 1) 소득 / 지출
     # ------------------------------------------
     salary_amounts = []
@@ -69,7 +68,6 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     
     features["saving_rate_6m"] = saving_rate
 
-    # ------------------------------------------
     # 2) 유동성
     # ------------------------------------------
     balance_list = []
@@ -93,7 +91,6 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
         liquidity_months = 12
     features["liquidity_months_3m"] = liquidity_months
 
-    # ------------------------------------------
     # 3) 해외 송금
     # ------------------------------------------
     remit_amounts = []
@@ -144,7 +141,6 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     else:
         features["remittance_cycle_stability"] = 0.0
 
-    # ------------------------------------------
     # 4) 대출 / 연체
     # ------------------------------------------
     loan_principal_total = 0.0
@@ -185,7 +181,6 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     else:
         features["recent_overdue_flag"] = 0
 
-    # ------------------------------------------
     # 5) 카드 위험도
     # ------------------------------------------
     max_utilization_ratio = 0.0
@@ -211,8 +206,7 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
     else:
         features["card_cash_advance_ratio"] = 0.0
 
-    # ------------------------------------------
-    # 6) 리스크 이벤트
+    # 6) 리스크
     # ------------------------------------------
     risk_cnt = 0
     if overdue_cnt_total > 0: risk_cnt += 1

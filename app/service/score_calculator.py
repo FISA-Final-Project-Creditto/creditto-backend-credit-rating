@@ -41,30 +41,22 @@ def calculate_final_score(features: dict) -> int:
     # -------------------------------
     scaler = load_scaler()
     
-    # 학습할 때와 똑같이 스케일링(MinMax) 적용 -> 결과는 numpy array
+    # 스케일링 적용
     X_scaled_array = scaler.transform(df)
-    
-    # [중요] 경고 메시지 제거를 위해 다시 DataFrame으로 변환 (컬럼명 복구)
     X_scaled_df = pd.DataFrame(X_scaled_array, columns=MODEL_FEATURE_ORDER)
     
-    # -------------------------------
-    # 3) 모델 로딩 + 예측 (Random Forest)
-    # -------------------------------
-    # [수정] 상수항(const) 추가 로직 삭제 (Random Forest는 불필요)
+    # 모델 로딩 + 예측
     model = load_credit_model()
     
     # 예측 실행
     pred = model.predict(X_scaled_df)
 
-    # 결과값 추출 (배열의 첫 번째 값)
+    # 결과값 추출
     raw_score = float(pred[0])
 
-    # -------------------------------
-    # 4) 점수 반올림 + 범위 제한 (클램프)
-    # -------------------------------
+    # 점수 반올림 + 범위 제한
     score = round(raw_score)
     
-    # SQL 로직(2:6:2 분포 전략)과 동일하게 550 ~ 920 사이로 제한
     score = max(550, min(920, score))
 
     return score

@@ -1,7 +1,11 @@
 # API 엔드포인트
 from fastapi import APIRouter, Depends
 
-from app.schema.score import ScoreRequest, ScoreResponse, ScoreHistoryResponse
+from sqlalchemy.orm import Session
+from app.schema.score import (
+    ScoreRequest, ScoreResponse, ScoreHistoryResponse,
+    CreditScorePredictRequest, CreditScorePredictResponse
+)
 from app.db.core_banking import get_core_banking_db
 from app.db.mydata import get_mydata_db
 import app.service.scoring_service as scoring_service
@@ -39,3 +43,13 @@ def credit_score_history(
 ):
     history = credit_repository.get_credit_score_history(user_id, core_db)
     return ScoreHistoryResponse(history=history)
+
+# ================ 신용 점수 예측 엔드포인트 ==================
+@router.post("/prediction", response_model=CreditScorePredictResponse)
+def predict_credit_score(
+    request: CreditScorePredictRequest,
+    core_db: Session = Depends(get_core_banking_db),
+    mydata_db: Session = Depends(get_mydata_db)
+):
+    result = scoring_service.process_prediction(request, core_db, mydata_db)
+    return result       

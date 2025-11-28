@@ -10,7 +10,7 @@ class ScoreRequest(BaseModel):
 class ScoreResponse(BaseModel):
     credit_score: int
 
-# 히스토리 조회: 월별 평균 점수
+# 히스토리 조회: 월별 평균 점수 -> 리스트 형태로 반환
 class ScoreHistoryItem(BaseModel):
     year: int
     month: int
@@ -18,3 +18,27 @@ class ScoreHistoryItem(BaseModel):
 
 class ScoreHistoryResponse(BaseModel):
     history: list[ScoreHistoryItem]  # 최대 7개월치
+
+
+# ===============================================
+# 신용 점수 예측
+
+# 요청: 유저 ID, 월 정기 송금액
+class CreditScorePredictRequest(BaseModel):
+    user_id: int
+    monthly_amount: float # 정기 송금 등록할 월 금액
+
+# 예측 점수 정보
+class PredictedScore(BaseModel):
+    score: int # 예측 점수
+    delta: int # 상슥폭
+
+# 응답: 예측 응답 전체
+class CreditScorePredictResponse(BaseModel):
+    user_id: int
+    monthly_remit_amount: float
+    current_score: int
+
+    after_6m: PredictedScore
+    after_12m: PredictedScore
+    after_18m: PredictedScore

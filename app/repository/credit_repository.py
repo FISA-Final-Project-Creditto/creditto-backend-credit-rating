@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 
-# 최신 신용점수 저장
+# ================ 최신 신용 점수 저장 메서드 ==================
 def save_latest_credit_score(db: Session, user_id: int, credit_score: int):
 
     db.execute(
@@ -19,6 +19,7 @@ def save_latest_credit_score(db: Session, user_id: int, credit_score: int):
     db.commit()
 
 
+# ================ 신용 점수 기록 저장 메서드 ==================
 # 신용점수 기록 저장 - user_id, created_date 복합 키 저장
 def save_credit_score_history(db: Session, user_id: int, credit_score: int):
     db.execute(
@@ -50,7 +51,7 @@ def get_latest_credit_score(user_id: int, core_db: Session):
     return int(result.score)
 
 
-# ================ 신용 점수 히스토리 조회 메서드 (월별 평균) ==================
+# ================ 신용 점수 기록 조회 메서드 (월별 평균) ==================
 def get_credit_score_history(user_id: int, core_db: Session):
 
     results = core_db.execute(

@@ -106,7 +106,7 @@ def extract_features(transaction_rows, card_rows, loan_rows, remit_rows):
             remit_cnt += 1
             remit_total_amount += amount
             remit_amounts.append(amount)
-            if str(row.status).upper() == "FAILED":
+            if str(row.remittance_status).upper() == "FAILED":
                 remit_fail += 1
 
     features["remittance_count_6m"] = remit_cnt

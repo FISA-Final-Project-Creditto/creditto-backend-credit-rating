@@ -30,19 +30,6 @@ def calculate_credit_score(request: ScoreRequest, core_db: Session, mydata_db: S
     return {"credit_score": credit_score}
 
 
-    return {"credit_score": credit_score, "features": features}
-
-
-# =========================================================
-# 헬퍼 함수: 사용자 데이터 조회
-# =========================================================
-def _fetch_user_data(user_id: int, core_db: Session, mydata_db: Session):
-    overseas_rows = core_db.execute(text("SELECT send_amount, remittance_status, created_at FROM overseas_remittance WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
-    return overseas_rows, card_rows, loan_rows, transaction_rows
-
 
 # =========================================================
 # 신용 점수 및 피처 데이터 조회 (신용 보고서용)
@@ -52,7 +39,15 @@ def get_credit_report_data(user_id: int, core_db: Session, mydata_db: Session):
 
     features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
     credit_score = calculate_final_score(features)
+
+    rounded_features = {}
     for key, value in features.items():
+        if isinstance(value, float):
+            rounded_features[key] = round(value, 2)
+        else:
+            rounded_features[key] = value
+
+    return {"credit_score": credit_score, "features": rounded_features}
 
 
 # =========================================================
@@ -82,3 +77,14 @@ def get_latest_credit_score(user_id: int, core_db: Session):
 
 def get_credit_score_history(user_id: int, core_db: Session):
     return repo_get_history(user_id, core_db)
+
+
+# =========================================================
+# 헬퍼 함수: 사용자 데이터 조회
+# =========================================================
+def _fetch_user_data(user_id: int, core_db: Session, mydata_db: Session):
+    overseas_rows = core_db.execute(text("SELECT send_amount, remittance_status, created_at FROM overseas_remittance WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+    return overseas_rows, card_rows, loan_rows, transaction_rows

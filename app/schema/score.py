@@ -1,6 +1,7 @@
 # API 요청과 응답 정의 스키마
 
 from pydantic import BaseModel
+from typing import Dict, Union # Import Dict and Union
 
 # 요청: user_id
 class ScoreRequest(BaseModel):
@@ -10,7 +11,21 @@ class ScoreRequest(BaseModel):
 class ScoreResponse(BaseModel):
     credit_score: int
 
-# 히스토리 조회: 월별 평균 점수 -> 리스트 형태로 반환
+# ===============================================
+# 신용 보고서 반환
+# ===============================================
+
+# 신용 보고서 응답
+class CreditReportResponse(BaseModel):
+    credit_score: int
+    features: Dict[str, Union[float, int]] # 피처 이름과 값(값은 float 또는 int 가능)
+
+
+# ===============================================
+# 신용 점수 기록 조회
+# ===============================================
+
+# 신용 점수 기록 조회: 월별 평균 점수 -> 리스트 형태로 반환
 class ScoreHistoryItem(BaseModel):
     year: int
     month: int
@@ -22,6 +37,7 @@ class ScoreHistoryResponse(BaseModel):
 
 # ===============================================
 # 신용 점수 예측
+# ===============================================
 
 # 요청: 유저 ID, 월 정기 송금액
 class CreditScorePredictRequest(BaseModel):

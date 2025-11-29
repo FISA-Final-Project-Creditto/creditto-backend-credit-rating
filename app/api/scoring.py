@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 from app.schema.score import (
-    ScoreRequest, ScoreResponse, ScoreHistoryResponse,
+    ScoreRequest, ScoreResponse, ScoreHistoryResponse, CreditReportResponse,
     CreditScorePredictRequest, CreditScorePredictResponse
 )
 from app.db.core_banking import get_core_banking_db
@@ -44,6 +44,20 @@ def credit_score_history(
     history = credit_repository.get_credit_score_history(user_id, core_db)
     return ScoreHistoryResponse(history=history)
 
+
+# ================ 신용 보고서 엔드포인트 ==================
+@router.get("/report/{user_id}", response_model=CreditReportResponse)
+def credit_report(
+    user_id: int,
+    core_db: Session = Depends(get_core_banking_db),
+    mydata_db: Session = Depends(get_mydata_db)
+):
+    report_data = scoring_service.get_credit_report_data(user_id, core_db, mydata_db)
+    return CreditReportResponse(
+        credit_score=report_data["credit_score"],
+        features=report_data["features"]
+    )
+
 # ================ 신용 점수 예측 엔드포인트 ==================
 @router.post("/prediction", response_model=CreditScorePredictResponse)
 def predict_credit_score(
@@ -52,4 +66,4 @@ def predict_credit_score(
     mydata_db: Session = Depends(get_mydata_db)
 ):
     result = scoring_service.process_prediction(request, core_db, mydata_db)
-    return result       
+    return result

@@ -26,7 +26,7 @@ def calculate_credit_score(
 
     # DB 조회
     overseas_rows = core_read_db.execute(
-        text("SELECT send_amount, status, created_at FROM overseas_remittance WHERE user_id = :user_id"),
+        text("SELECT send_amount, remittance_status, created_at FROM overseas_remittance WHERE user_id = :user_id"),
         {"user_id": user_id},
     ).fetchall()
     card_rows = mydata_db.execute(text("SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()

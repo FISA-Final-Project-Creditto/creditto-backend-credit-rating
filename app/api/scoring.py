@@ -55,8 +55,8 @@ def credit_score_history(
 @router.get("/report/{user_id}", response_model=CreditReportResponse)
 def credit_report(
     user_id: int,
-    core_db: Session = Depends(get_core_banking_db),
-    mydata_db: Session = Depends(get_mydata_db)
+    core_db: Session = Depends(get_core_banking_read_db),
+    mydata_db: Session = Depends(get_mydata_read_db)
 ):
     report_data = scoring_service.get_credit_report_data(user_id, core_db, mydata_db)
     return CreditReportResponse(

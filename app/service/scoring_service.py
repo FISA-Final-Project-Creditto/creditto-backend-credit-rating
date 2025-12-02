@@ -42,6 +42,26 @@ def calculate_credit_score(
     return {"credit_score": credit_score}
 
 
+
+# =========================================================
+# 신용 점수 및 피처 데이터 조회 (신용 보고서용)
+# =========================================================
+def get_credit_report_data(user_id: int, core_db: Session, mydata_db: Session):
+    overseas_rows, card_rows, loan_rows, transaction_rows = _fetch_user_data(user_id, core_db, mydata_db)
+
+    features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
+    credit_score = calculate_final_score(features)
+
+    rounded_features = {}
+    for key, value in features.items():
+        if isinstance(value, float):
+            rounded_features[key] = round(value, 2)
+        else:
+            rounded_features[key] = value
+
+    return {"credit_score": credit_score, "features": rounded_features}
+
+
 # =========================================================
 # 미래 점수 예측 
 # =========================================================

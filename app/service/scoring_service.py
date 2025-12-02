@@ -96,3 +96,37 @@ def get_latest_credit_score(user_id: int, core_db: Session):
 
 def get_credit_score_history(user_id: int, core_db: Session):
     return repo_get_history(user_id, core_db)
+
+
+def _fetch_user_data(user_id: int, core_db: Session, mydata_db: Session):
+    overseas_rows = core_db.execute(
+        text(
+            "SELECT send_amount, remittance_status, created_at "
+            "FROM overseas_remittance WHERE user_id = :user_id"
+        ),
+        {"user_id": user_id},
+    ).fetchall()
+    card_rows = mydata_db.execute(
+        text(
+            "SELECT tx_datetime, tx_amount, pay_type, tx_category, credit_limit, "
+            "outstanding_amt, collected_at FROM mydata_card WHERE user_id = :user_id"
+        ),
+        {"user_id": user_id},
+    ).fetchall()
+    loan_rows = mydata_db.execute(
+        text(
+            "SELECT loan_principal, interest_rate, status, overdue_count_12m, "
+            "overdue_amount, max_overdue_days, last_overdue_dt, collected_at "
+            "FROM mydata_loan WHERE user_id = :user_id"
+        ),
+        {"user_id": user_id},
+    ).fetchall()
+    transaction_rows = mydata_db.execute(
+        text(
+            "SELECT tx_datetime, amount, direction, category, balance_after, "
+            "collected_at FROM mydata_transaction WHERE user_id = :user_id"
+        ),
+        {"user_id": user_id},
+    ).fetchall()
+
+    return overseas_rows, card_rows, loan_rows, transaction_rows

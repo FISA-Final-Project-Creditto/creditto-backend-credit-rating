@@ -57,6 +57,6 @@ def calculate_final_score(features: dict) -> int:
     # 점수 반올림 + 범위 제한
     score = round(raw_score)
     
-    score = max(550, min(920, score))
+    score = max(550, min(950, score))
 
     return score

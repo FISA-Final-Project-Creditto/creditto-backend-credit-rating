@@ -58,5 +58,4 @@ def calculate_final_score(features: dict) -> int:
     score = round(raw_score)
     
     score = max(550, min(950, score))
-
     return score

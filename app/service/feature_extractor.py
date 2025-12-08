@@ -8,10 +8,10 @@ def to_date(dt):
     if isinstance(dt, datetime): return dt.date()
     try:
         if isinstance(dt, str): return date.fromisoformat(dt)
-    except: pass
+    except Exception: pass
     try:
         return datetime.fromisoformat(str(dt)).date()
-    except: return None
+    except Exception: return None
 
 def safe_float(v):
     try: return float(v)

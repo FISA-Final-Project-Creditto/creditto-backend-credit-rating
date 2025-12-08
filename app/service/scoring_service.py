@@ -33,8 +33,18 @@ def calculate_credit_score(
     loan_rows = mydata_db.execute(text("SELECT loan_principal, interest_rate, status, overdue_count_12m, overdue_amount, max_overdue_days, last_overdue_dt, collected_at FROM mydata_loan WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
     transaction_rows = mydata_db.execute(text("SELECT tx_datetime, amount, direction, category, balance_after, collected_at FROM mydata_transaction WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
 
-    features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
-    credit_score = calculate_final_score(features)
+    try:
+        if not overseas_rows and not card_rows and not loan_rows and not transaction_rows:
+            credit_score = 550
+        else:
+            features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
+            credit_score = calculate_final_score(features)
+            if credit_score < 550:
+                credit_score = 550
+    except Exception as e:
+        # 에러 로깅 (실제 프로덕션에서는 logger 사용)
+        print(f"An error occurred during credit score calculation: {e}")
+        credit_score = 550
 
     save_latest_credit_score(core_write_db, user_id, credit_score)
     save_credit_score_history(core_write_db, user_id, credit_score)
@@ -49,8 +59,19 @@ def calculate_credit_score(
 def get_credit_report_data(user_id: int, core_db: Session, mydata_db: Session):
     overseas_rows, card_rows, loan_rows, transaction_rows = _fetch_user_data(user_id, core_db, mydata_db)
 
-    features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
-    credit_score = calculate_final_score(features)
+    try:
+        if not overseas_rows and not card_rows and not loan_rows and not transaction_rows:
+            return {"credit_score": 550, "features": {}}
+
+        features = extract_features(transaction_rows, card_rows, loan_rows, overseas_rows)
+        credit_score = calculate_final_score(features)
+        if credit_score < 550:
+            credit_score = 550
+    except Exception as e:
+        # 에러 로깅 (실제 프로덕션에서는 logger 사용)
+        print(f"An error occurred during credit report data generation: {e}")
+        return {"credit_score": 550, "features": {}}
+
 
     rounded_features = {}
     for key, value in features.items():
